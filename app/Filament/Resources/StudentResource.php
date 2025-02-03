@@ -14,6 +14,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -157,6 +158,16 @@ class StudentResource extends Resource
 
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('downloadPdf')
+                  ->url(function(Student $student) {
+                        return route('student.generate.invoice', $student);
+                  })
+                  ->openUrlInNewTab(),
+                Action::make('qrCode')
+                  ->url(function(Student $student) {
+                        return static::getUrl('qrCode', ['record'=> $student]);
+                  })
+                  ->openUrlInNewTab()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -184,6 +195,7 @@ class StudentResource extends Resource
             'index' => Pages\ListStudents::route('/'),
             'create' => Pages\CreateStudent::route('/create'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
+            'qrCode' => Pages\GenerateQrCode::route('/{record}/qrcode'),
         ];
     }
  

@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->path('admin')
             ->favicon('https://cdn-icons-png.flaticon.com/512/5850/5850276.png')
-            ->login()
+            ->login(Login::class)
             ->colors([
                 'primary' => Color::Amber,
                 'danger' => Color::Red,

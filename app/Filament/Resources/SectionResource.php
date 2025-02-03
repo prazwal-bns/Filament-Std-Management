@@ -9,6 +9,7 @@ use App\Models\Classes;
 use App\Models\Section;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Enums\ActionsPosition;
@@ -17,6 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Validation\Rules\Unique;
 
 class SectionResource extends Resource
 {
@@ -51,7 +53,10 @@ class SectionResource extends Resource
                     ->relationship('class', 'name'),
                     // ->options(fn()=> Classes::pluck('name', 'id')),
                 Forms\Components\TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->unique(ignoreRecord: true, modifyRuleUsing:function(Get $get, Unique $rule){
+                        return $rule->where('class_id', $get('class_id'));
+                    }),
             ]);
     }
 

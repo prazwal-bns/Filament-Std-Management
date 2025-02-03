@@ -9,7 +9,9 @@ class StudentBarChart extends ChartWidget
 {
     protected static ?string $heading = 'Monthly Student Registrations';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
+
+    protected int | string | array $columnSpan = 'full';
 
     protected static ?string $minHeight = '800px';
 

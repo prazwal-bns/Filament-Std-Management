@@ -10,7 +10,9 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Widgets\Widget;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
+use Illuminate\Validation\Rules\Unique;
 
 class CreateSectionWidget extends Widget implements HasForms
 {
@@ -35,7 +37,19 @@ class CreateSectionWidget extends Widget implements HasForms
                     ->required()
                     ->options(fn()=> Classes::pluck('name', 'id')),
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    // ->unique(ignoreRecord: true, modifyRuleUsing:function(Get $get, Unique $rule){
+                    //     return $rule->where('class_id', $get('class_id'));
+                    // }),
+                    ->unique(
+                        table: Section::class,
+                        column: 'name',
+                        ignoreRecord: true,
+                        modifyRuleUsing: function (Get $get, Unique $rule) {
+                            return $rule->where('class_id', $get('class_id'));
+                        }
+                    )
+                    ->validationAttribute('Section Name')
             ])
             ->statePath('data');
     }

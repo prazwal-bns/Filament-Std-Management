@@ -10,7 +10,9 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class RecentlyRegisteredStudents extends BaseWidget
 {
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 2;
+
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -21,9 +23,20 @@ class RecentlyRegisteredStudents extends BaseWidget
                     ->limit(10)
             )
             ->columns([
-                 TextColumn::make("name"),
-                 TextColumn::make("class.name"),
-                 TextColumn::make("section.name"),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('class.name')
+                    ->sortable()
+                    ->searchable()
+                    ->badge(),
+                Tables\Columns\TextColumn::make('section.name')
+                    // ->badge()
+                    ->color('info')
+                    ->sortable(),
             ])
             ->defaultPaginationPageOption(5);
     }

@@ -1,0 +1,113 @@
+services:
+  # PHP-FPM Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: std-managment-sys     # can be your project name std-managment-sys
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - laravel_network
+    depends_on:
+      - mysql
+      - redis
+      
+  # Nginx Service
+  webserver:
+    image: nginx
+    container_name: std-managment-sys_webserver     # projectname_webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx:/etc/nginx/conf.d
+    networks:
+      - laravel_network
+    depends_on:
+      - app
+
+  # MySQL Service for db1
+  mysql:
+    image: mysql:8.0
+    container_name: std-managment-sys_database   # projectname_databasename
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: std-management-sys
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - db1data:/var/lib/mysql
+    networks:
+      - laravel_network
+
+  # Redis Service
+  redis:
+    image: redis:alpine
+    container_name: std-managment-sys_redis  # projectname_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - laravel_network
+
+  # PHPMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: std-managment-sys_phpmyadmin      # projectname_phpmyadmin
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - laravel_network
+
+
+
+  # Node Service (for frontend assets)
+  # node:
+  #   image: node:18
+  #   container_name: std-managment-sys_node       # projectname_node
+  #   restart: unless-stopped
+  #   working_dir: /var/www/html
+  #   entrypoint:  ["sleep", "infinity"]
+  #   volumes:
+  #     - .:/var/www/html
+  #   networks:
+  #     - laravel_network
+
+  composer:
+    image: composer
+    container_name: std-managment-sys_composer_service       # projectname_composer_service
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ['composer']
+    command: ["install", "--ignore-platform-reqs"]
+
+    networks:
+      - laravel_network
+
+# Docker Volumes
+volumes:
+  db1data:
+    driver: local
+  db2data:
+    driver: local
+
+# Docker Networks
+networks:
+  laravel_network:
+    driver: bridge
